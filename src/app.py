@@ -1,6 +1,6 @@
 import streamlit as st
 import altair as alt
-from paginas import page1, page2, page3, page4, page5
+from paginas import page1, page2, page3
 
 st.set_page_config(
     page_title="Analysis of the amari dataset",
@@ -12,10 +12,8 @@ alt.themes.enable("dark")
 
 pages = {
     "Analise Inicial do dataset": page1.main,
-    "Modelos treinados e as suas métricas": page2.main,
-    "Graficos LIME": page3.main,
-    "Graficos SHAP": page4.main,
-    "Graficos dos Modelos": page5.main
+    "Decision Tree": page2.main,
+    "Naive Bayes": page3.main
 }
 
 if __name__ == "__main__":

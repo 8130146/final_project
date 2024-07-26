@@ -2,6 +2,7 @@ import streamlit as st
 import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
+import seaborn as sns
 import lime.lime_tabular
 import pickle
 import graphviz
@@ -161,7 +162,13 @@ def naivebayes():
 
     nb.fit(X_train, Y_train)
 
+    # Extraindo probabilidades
+    class_priors = nb.class_prior_
+    means = nb.theta_
+    variances = nb.var_
+
     y_pred = nb.predict(X_test)
+    y_proba = nb.predict_proba(X_test)
 
     models_dir = '../models'
     os.makedirs(models_dir, exist_ok=True)
@@ -195,11 +202,58 @@ def naivebayes():
     with open(file_path, 'wb') as file:
         pickle.dump(metrics_naive_bayes, file)
     print(metrics_naive_bayes)
+
+    file_path_data = os.path.join(metrics_dir, 'data_naive_bayes.pkl')
+    with open(file_path_data, 'wb') as f:
+        pickle.dump((X_test, Y_test, y_pred, y_proba, class_priors,
+                    means, variances, X.columns, np.unique(Y)), f)
+
+    # Guargar graficos
+    # Probabilidades a priori
+    fig, ax = plt.subplots()
+    ax.bar(np.unique(Y), class_priors)
+    ax.set_title('Probabilidades a Priori')
+    ax.set_xlabel('Classes')
+    ax.set_ylabel('Probabilidade')
+    fig.savefig('../images/probabilidades_a_priori.png')
+
+    # Distribuições das características por classe
+    for feature_name in X.columns:
+        fig, ax = plt.subplots()
+        for class_idx, class_name in enumerate(np.unique(Y)):
+            sns.kdeplot(X_train[Y_train == class_idx]
+                        [feature_name], label=class_name, ax=ax)
+        ax.set_title(f'Distribuição da Característica: {feature_name}')
+        ax.set_xlabel(feature_name)
+        ax.set_ylabel('Densidade')
+        ax.legend(title='Classe')
+        fig.savefig(f'../images/distribuicao_{feature_name}.png')
+
+    # Analisar a contribuição de cada característica usando y_proba
+    for i, class_name in enumerate(np.unique(Y)):
+        fig, ax = plt.subplots()
+        feature_contributions = []
+        for j, feature_name in enumerate(X.columns):
+            # Para cada característica, calcular a média da probabilidade predita para a classe
+            contributions = y_proba[:, i] * \
+                (X_test[feature_name] - means[i, j])**2 / (2 * variances[i, j])
+            feature_contributions.append(contributions.mean())
+        feature_contributions = np.array(feature_contributions)
+        ax.bar(X.columns, feature_contributions)
+        ax.set_title(
+            f'Contribuição das Características para a Classe: {class_name}')
+        ax.set_xlabel('Características')
+        ax.set_ylabel('Contribuição Média')
+        plt.xticks(rotation=45, ha='right')
+        fig.tight_layout()
+        fig.savefig(f'../images/contribuicao_caracteristicas_{class_name}.png')
+
     # Use original column names for SHAP plots
     feature_names = X.columns if hasattr(X, 'columns') else [f'feature_{
         i}' for i in range(X.shape[1])]
 
     generate_shap_plot_nb(nb, X_train, X_test, feature_names)
+
     generate_lime_plot_nb(nb, X_train, X_test, X)
 
 

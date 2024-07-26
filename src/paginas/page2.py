@@ -1,36 +1,45 @@
+from utils import utils
 import streamlit as st
-import pickle
 
-
-def load_metrics(metrics_path):
-
-    with open(metrics_path, 'rb') as file:
-        metrics = pickle.load(file)
-    metrics = {
-        'Accuracy': metrics['accuracy'],
-        'Precision': metrics['precision'],
-        'Recall': metrics['recall'],
-        'F1': metrics['f1']
-    }
-    return metrics
+import sys
+sys.path.append('../utils')
 
 
 def main():
-    st.title('Modelos Treinados e as suas métricas')
-    st.markdown("### Decision Tree")
+    st.title('Decision Tree')
+    st.markdown("### Metricas")
     st.markdown("##### Test Size: 0.2")
     st.markdown("##### Random State: 42")
-    metrics_dt = load_metrics("./metrics/metrics_decision_tree.pkl")
+    metrics_dt = utils.load_metrics("./metrics/metrics_decision_tree.pkl")
     st.markdown(f"##### Accuracy: {metrics_dt['Accuracy']}")
     st.markdown(f"##### Precision: {metrics_dt['Precision']}")
     st.markdown(f"##### Recall: {metrics_dt['Recall']}")
     st.markdown(f"##### F1: {metrics_dt['F1']}")
 
-    st.markdown("### Naive Bayes")
-    st.markdown("##### Test Size: 0.2")
-    st.markdown("##### Random State: 42")
-    metrics_nb = load_metrics("./metrics/metrics_naive_bayes.pkl")
-    st.markdown(f"##### Accuracy: {metrics_nb['Accuracy']}")
-    st.markdown(f"##### Precision: {metrics_nb['Precision']}")
-    st.markdown(f"##### Recall: {metrics_nb['Recall']}")
-    st.markdown(f"##### F1: {metrics_nb['F1']}")
+    st.markdown("### Grafico SHAP da Decision Tree")
+    image_path = "./images/shap_decision_tree.png"
+    st.image(image_path, caption="Imagem Carregada", use_column_width=True)
+
+    st.markdown("### Grafico LIME da Decision Tree")
+    image_path = "./images/lime_decisionTree.png"
+    st.image(image_path, caption="Imagem Carregada", use_column_width=True)
+
+    st.markdown("### Grafico da Decision Tree")
+    image_path = "./images/grafico_decision_tree.png"
+    # Inicializa a variável de estado se ela não existir
+    if 'mostrar_tamanho_real' not in st.session_state:
+        st.session_state['mostrar_tamanho_real'] = False
+
+    # Função para alternar o estado
+    def toggle_image_size():
+        st.session_state['mostrar_tamanho_real'] = not st.session_state['mostrar_tamanho_real']
+
+    # Botão para alternar o tamanho da imagem
+    if st.button('Aumentar ou Diminuir imagem'):
+        toggle_image_size()
+
+    # Verifica o estado atual e mostra a imagem de acordo
+    if st.session_state['mostrar_tamanho_real']:
+        st.image(image_path, caption="Imagem Carregada", width=7000)
+    else:
+        st.image(image_path, caption="Imagem Carregada", use_column_width=True)
