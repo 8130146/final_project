@@ -8,11 +8,12 @@ import pickle
 import graphviz
 import os
 import shap
-from sklearn.model_selection import train_test_split, RandomizedSearchCV
+from sklearn.model_selection import train_test_split, RandomizedSearchCV, GridSearchCV
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.tree import export_graphviz
 from sklearn.naive_bayes import GaussianNB
 from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
+from imblearn.over_sampling import SMOTE
 
 
 @st.cache_resource
@@ -155,11 +156,20 @@ def naivebayes():
     X = dados.drop(["DDoS"], axis=1)
     Y = dados['DDoS']
 
+    # Aplicar SMOTE para balancear as classes
+    smote = SMOTE(random_state=42)
+    X_resampled, Y_resampled = smote.fit_resample(X, Y)
+
     X_train, X_test, Y_train, Y_test = train_test_split(
-        X, Y, test_size=0.2, random_state=42)
+        X_resampled, Y_resampled, test_size=0.2, random_state=42, stratify=Y_resampled)
 
-    nb = GaussianNB()
+    param_grid = {'var_smoothing': np.logspace(0, -9, num=100)}
 
+    grid_search = GridSearchCV(
+        estimator=GaussianNB(), param_grid=param_grid, cv=5, scoring='f1')
+    grid_search.fit(X_train, Y_train)
+
+    nb = grid_search.best_estimator_
     nb.fit(X_train, Y_train)
 
     # Extraindo probabilidades
