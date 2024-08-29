@@ -41,7 +41,7 @@ def main():
 
         st.markdown('### Analise de trafego 5G')
 
-        start_date, end_date = st.date_input('Select a Date range', [
+        start_date, end_date = st.date_input('Selecione um intervalo de datas', [
             df_selected_ue['_time'].min().date(), df_selected_ue['_time'].max().date()])
         df_selected_ue = df_selected_ue[(df_selected_ue['_time'].dt.date >= start_date) & (
             df_selected_ue['_time'].dt.date <= end_date)]

@@ -3,7 +3,7 @@ import altair as alt
 from paginas import page1, page2, page3
 
 st.set_page_config(
-    page_title="Analysis of the amari dataset",
+    page_title="Deteção de ataques DDoS",
     layout="centered",
     initial_sidebar_state="expanded")
 

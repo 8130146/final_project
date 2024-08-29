@@ -1,7 +1,6 @@
 import streamlit as st
 import pandas as pd
 import pickle
-import matplotlib.pyplot as plt
 
 
 def load_metrics(metrics_path):
@@ -27,8 +26,7 @@ def main():
 
     # Carregar dados salvos
     with open('metrics/data_naive_bayes.pkl', 'rb') as f:
-        X_test, y_test, y_pred, y_proba, class_priors, means, variances, feature_names, target_names = pickle.load(
-            f)
+        means, variances, feature_names, target_names = pickle.load(f)
 
     st.title("Naive Bayes")
 
@@ -53,16 +51,11 @@ def main():
     st.subheader("Variâncias das Características por Classe")
     st.write(pd.DataFrame(variances, index=target_names, columns=feature_names))
 
-    st.header("Probabilidades a Priori")
-    st.image('images/probabilidades_a_priori.png')
-    st.write(pd.DataFrame(class_priors, index=target_names,
-             columns=['Prior Probability']))
-
     st.header("Contribuicao das caracteristicas para cada classe")
     st.subheader('Contribuicao das caracteristicas para classe 0')
-    st.image(f'images/contribuicao_caracteristicas_0.png')
+    st.image(f'images/contribuicao_caracteristicas_classe_0.png')
     st.subheader('Contribuicao das caracteristicas para classe 1')
-    st.image(f'images/contribuicao_caracteristicas_1.png')
+    st.image(f'images/contribuicao_caracteristicas_classe_1.png')
 
     st.header("Grafico SHAP do Naive Bayes")
     image_path = "images/shap_naive_bayes.png"
