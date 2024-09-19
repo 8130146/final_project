@@ -40,27 +40,13 @@ def main():
     st.markdown(f"##### F1: {metrics_nb['F1']}")
 
     st.header("Distribuicoes das caracteristicas por classe")
-    # Distribuições das características por classe
-    for feature_name in feature_names:
-        st.subheader(f'Distribuição da Característica: {feature_name}')
-        st.image(f'images/distribuicao_{feature_name}.png')
+    # Select box for choosing the feature
+    selected_feature = st.selectbox('Escolha a Característica', feature_names)
+    st.subheader(f'Distribuição da Característica: {selected_feature}')
+    st.image(f'images/distribuicao_{selected_feature}.png')
 
     st.header("Médias e Variâncias")
     st.subheader("Médias das Características por Classe")
     st.write(pd.DataFrame(means, index=target_names, columns=feature_names))
     st.subheader("Variâncias das Características por Classe")
     st.write(pd.DataFrame(variances, index=target_names, columns=feature_names))
-
-    st.header("Contribuicao das caracteristicas para cada classe")
-    st.subheader('Contribuicao das caracteristicas para classe 0')
-    st.image(f'images/contribuicao_caracteristicas_classe_0.png')
-    st.subheader('Contribuicao das caracteristicas para classe 1')
-    st.image(f'images/contribuicao_caracteristicas_classe_1.png')
-
-    st.header("Grafico SHAP do Naive Bayes")
-    image_path = "images/shap_naive_bayes.png"
-    st.image(image_path, caption="Imagem Carregada", use_column_width=True)
-
-    st.header("Grafico LIME do Naive Bayes")
-    image_path = "images/lime_naiveBayes.png"
-    st.image(image_path, caption="Imagem Carregada", use_column_width=True)

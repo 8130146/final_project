@@ -16,14 +16,6 @@ def main():
     st.markdown(f"##### Recall: {metrics_dt['Recall']}")
     st.markdown(f"##### F1: {metrics_dt['F1']}")
 
-    st.markdown("### Grafico SHAP da Decision Tree")
-    image_path = "./images/shap_decision_tree.png"
-    st.image(image_path, caption="Imagem Carregada", use_column_width=True)
-
-    st.markdown("### Grafico LIME da Decision Tree")
-    image_path = "./images/lime_decisionTree.png"
-    st.image(image_path, caption="Imagem Carregada", use_column_width=True)
-
     st.markdown("### Grafico da Decision Tree")
     image_path = "./images/grafico_decision_tree.png"
     # Inicializa a variável de estado se ela não existir
