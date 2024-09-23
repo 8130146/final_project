@@ -4,7 +4,7 @@ from paginas import page1, page2, page3, page4, page5, page6, page7
 
 st.set_page_config(
     page_title="Deteção de ataques DDoS",
-    layout="centered",
+    layout="wide",
     initial_sidebar_state="expanded")
 
 alt.themes.enable("dark")

@@ -16,17 +16,15 @@ from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_sc
 from imblearn.combine import SMOTEENN
 from imblearn.over_sampling import BorderlineSMOTE
 
+
 # Funcao para importar o dataset
-
-
 @st.cache_resource
 def load_dataset():
     data = pd.read_csv('../datasets/dataset_short.csv')
     return data
 
+
 # Funcao para calcular e guardar as metricas de um modelo
-
-
 def calc_save_metrics(Y_test, y_pred, nome):
     metrics = {}
     # Calcular a accuracy, precision, recall e F1-score
@@ -45,9 +43,8 @@ def calc_save_metrics(Y_test, y_pred, nome):
     with open(file_path, 'wb') as file:
         pickle.dump(metrics, file)
 
+
 # Funcao para guardar um modelo na pasta models
-
-
 def save_model(model, name):
     models_dir = '../models'
     os.makedirs(models_dir, exist_ok=True)
@@ -81,64 +78,53 @@ def generate_lime_plot(best_model, X_train, X_test, X, nome):
 
     # Selecionar instâncias com previsões específicas (3 com previsão 1 e 3 com previsão 0)
     instances_1 = X_test_df[predictions == 1].head(
-        3)  # Pegar 3 instâncias com previsão 1
+        3)  # Pegar em 3 instâncias com previsão 1
     instances_0 = X_test_df[predictions == 0].head(
-        3)  # Pegar 3 instâncias com previsão 0
+        3)  # Pegar em 3 instâncias com previsão 0
     instances = pd.concat([instances_1, instances_0])  # Combinar instâncias
-
     # Criar explicador LIME
     explainer = lime.lime_tabular.LimeTabularExplainer(
         X_train_df.values, mode='classification', feature_names=feature_names,
         class_names=['0', '1'], verbose=True, random_state=42)
 
     output_dir = f'../images/{nome}'
-    os.makedirs(output_dir, exist_ok=True)  # Cria o diretório se não existir
-
-    # Lista para armazenar previsões
+    os.makedirs(output_dir, exist_ok=True)  # Cria a pasta se não existir
+    # Lista para guardar as previsões de cada instancia das 6
     predictions_list = []
 
     # Iterar sobre as 6 instâncias
     for idx, (i, instance) in enumerate(instances.iterrows()):
-        # Gerar explicação para a instância
+        # Criar explicação para a instância
         explanation = explainer.explain_instance(
             instance.values, best_model.predict_proba, num_features=num_features)
-
-        # Salvar o gráfico da explicação LIME
+        # Guardar o gráfico da explicação LIME
         fig = explanation.as_pyplot_figure()
         fig.savefig(os.path.join(output_dir, f'{nome}_instance_{
                     idx}.png'), bbox_inches='tight', dpi=150)
         plt.close(fig)
-
         # Obter as contribuições das features em formato tabular
         contributions = explanation.as_list()
-
         # Criar DataFrame com as contribuições das features
         contributions_df = pd.DataFrame(
             contributions, columns=['Feature', 'Contribution'])
-
-        # Salvar as contribuições das features em CSV
+        # Guardar as contribuições das features em CSV
         contributions_df.to_csv(os.path.join(
             output_dir, f'{nome}_contributions_instance_{idx}.csv'), index=False)
-
         # Obter a previsão para essa instância
         prediction = best_model.predict(instance.values.reshape(1, -1))[0]
-
         # Adicionar a instância e previsão à lista
         predictions_list.append([idx, prediction])
-
-    # Salvar as previsões em um arquivo CSV
+    # Guardar as previsões num ficheiro CSV
     predictions_df = pd.DataFrame(predictions_list, columns=[
                                   'instancia', 'previsão'])
     predictions_df.to_csv(os.path.join(
         output_dir, f'{nome}_predictions.csv'), index=False)
 
-    print(f"Explicações LIME, contribuições e previsões salvas em: {
+    print(f"Explicações LIME, contribuições e previsões guardadas em: {
           output_dir}")
 
 
 # Funcao para gerar a arvore de decisao
-
-
 def generate_dtree_graph(best_model, X):
     # Gerar ficheiro .dot
     img = export_graphviz(best_model, out_file=None,
@@ -152,27 +138,22 @@ def generate_dtree_graph(best_model, X):
     graph.render(os.path.join(folder_path, "grafico_decision_tree"),
                  format='png')
 
+
 # Funcao para gerar o grafico shap para a decisoon tree
-
-
-def generate_shap_plot(best_model, X_test, nome):
-    # Calculate SHAP values
+def generate_shap_plot_dTree(best_model, X_test, nome):
     explainer = shap.Explainer(best_model)
-
     shap_values = explainer.shap_values(X_test)
     print(shap_values.shape)
-
     shap_values_class_0 = shap_values[:, :, 0]
     shap_values_class_1 = shap_values[:, :, 1]
     output_dir = f'../images/{nome}'
-
+    os.makedirs(output_dir, exist_ok=True)
     shap.summary_plot(shap_values_class_0, X_test, show=False)
     fig = plt.gcf()
     fig.set_size_inches(24, 8)
     fig.savefig(os.path.join(output_dir, f'{nome}_class0.png'),
                 bbox_inches='tight', dpi=150)
     plt.close(fig)
-
     shap.summary_plot(shap_values_class_1, X_test, show=False)
     fig = plt.gcf()
     fig.set_size_inches(24, 8)
@@ -192,8 +173,6 @@ def generate_shap_plot(best_model, X_test, nome):
 
 
 # Funcao para treinar, exportar metricas, gerar arvore, gerar graficos SHAP e LIME para a decision tree
-
-
 def decisiontree():
     dados = load_dataset()
     X = dados.drop(["DDoS"], axis=1)
@@ -226,12 +205,11 @@ def decisiontree():
     calc_save_metrics(Y_test, y_pred, 'metrics_decision_tree.pkl')
     save_model(best_model, 'decision_tree_model.pkl')
     generate_dtree_graph(best_model, X)
-    generate_shap_plot(best_model, X_test, 'shap_dTree')
+    generate_shap_plot_dTree(best_model, X_test, 'shap_dTree')
     generate_lime_plot(best_model, X_train, X_test, X, 'lime_dTree')
 
+
 # Funcao para gerar graficos de densidade para cada carateristica separados por classe
-
-
 def plot_feature_distributions(X_train, Y_train):
     # Distribuições das características por classe
     for feature_name in X_train.columns:
@@ -247,34 +225,8 @@ def plot_feature_distributions(X_train, Y_train):
         fig.savefig(f'../images/distribuicao_{feature_name}.png')
         plt.close(fig)
 
-# Funcao para gerar graficos da contribuicao media de cada carateristica para a probabilidade predita de cada classe
-
-
-def analyze_feature_contributions(X_test, y_proba, means, variances, Y):
-    # Analisar a contribuição de cada característica usando y_proba
-    for class_index, class_name in enumerate(np.unique(Y)):
-        fig, ax = plt.subplots()
-        contributions = np.zeros(X_test.shape)
-
-        for j, feature_name in enumerate(X_test.columns):
-            # Para cada característica, calcular a contribuição média da probabilidade predita
-            contributions[:, j] = y_proba * (X_test[feature_name] -
-                                             means[class_index, j])**2 / (2 * variances[class_index, j])
-
-        ax.bar(X_test.columns, contributions.mean(axis=0))
-        ax.set_title(
-            f'Contribuição das Características para a Classe {class_name}')
-        ax.set_xlabel('Características')
-        ax.set_ylabel('Contribuição Média')
-        plt.xticks(rotation=45, ha='right')
-        fig.tight_layout()
-        fig.savefig(
-            f'../images/contribuicao_caracteristicas_classe_{class_name}.png')
-        plt.close(fig)
 
 # Funcao para gerar o grafico shap para o naive bayes
-
-
 def generate_shap_plot_nb(best_model, X_train, X_test, nome):
     # Resumir conjunto de treino em 5 clusters para acelarar calculo
     X_train_summary = shap.kmeans(X_train, 5)
@@ -313,8 +265,6 @@ def generate_shap_plot_nb(best_model, X_train, X_test, nome):
 
 
 # Funcao para treinar, exportar metricas, gerar graficos SHAP e LIME para o naive bayes
-
-
 def naivebayes():
     dados = load_dataset()
     dados.dropna(inplace=True)
@@ -364,11 +314,7 @@ def naivebayes():
     # Distribuições das características por classe
     plot_feature_distributions(X_train, Y_train)
 
-    # Analisar a contribuição de cada característica usando y_proba
-    analyze_feature_contributions(X_test, y_proba, means, variances, Y)
-
     generate_shap_plot_nb(nb, X_train, X_test, 'shap_naiveBayes')
-    # generate_shap_plot(nb, X_test, 'shap_naiveBayes')
     generate_lime_plot(nb, X_train, X_test, X, 'lime_naiveBayes')
 
 

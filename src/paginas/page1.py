@@ -16,6 +16,19 @@ def load_separate_by_imei(file):
     else:
         return {}
 
+# Função para criar gráficos
+
+
+def create_chart(df, x, y, title):
+    return alt.Chart(df).mark_line().encode(
+        x=x,
+        y=y,
+    ).properties(
+        width=600,
+        height=400,
+        title=title
+    ).interactive()
+
 
 def main():
     st.title('Carregar dataset')
@@ -34,7 +47,7 @@ def main():
             df_selected_ue = imeis_dataframes[selected_imei]
             st.write("Selected Imei: " + str(selected_imei))
 
-        st.write(df_selected_ue)
+        st.write(df_selected_ue.head(20))
 
         df_selected_ue['_time'] = pd.to_datetime(
             df_selected_ue['_time'], format='ISO8601')
@@ -46,48 +59,43 @@ def main():
         df_selected_ue = df_selected_ue[(df_selected_ue['_time'].dt.date >= start_date) & (
             df_selected_ue['_time'].dt.date <= end_date)]
 
-        # Grafico para mostrar a taxa de bits ao Longo do Tempo
-        st.markdown('##### Taxa de bits de downlink ao Longo do Tempo')
-        chart_bits = alt.Chart(df_selected_ue).mark_line().encode(
-            x='_time:T',
-            y='dl_bitrate:Q',
-        ).properties(
-            width=800,
-            height=400
-        ).interactive()
-        st.altair_chart(chart_bits)
+        # Organizar gráficos em duas colunas
+        col1, col2 = st.columns(2)
 
-        # Gráfico de Linhas para Taxa de Bits de Uplink ao Longo do Tempo
-        st.markdown('##### Taxa de Bits de Uplink ao Longo do Tempo')
-        ul_bitrate_chart = alt.Chart(df_selected_ue).mark_line().encode(
-            x='_time:T',
-            y='ul_bitrate:Q'
-        ).properties(
-            width=800,
-            height=400
-        ).interactive()
-        st.altair_chart(ul_bitrate_chart)
+        with col1:
+            chart = create_chart(df_selected_ue, '_time:T',
+                                 'dl_bitrate:Q', 'Taxa de bits de transmissoes Downlink')
+            st.altair_chart(chart)
 
-        # Gráfico de Linhas para Taxa de Retransmissões ao Longo do Tempo
-        st.markdown(
-            '##### Taxa de Retransmissões downlink da celula do dispositivo ao Longo do Tempo')
-        chart_retransmissao = alt.Chart(df_selected_ue).mark_line().encode(
-            x='_time:T',
-            y='cell_x_dl_retx:Q',
-        ).properties(
-            width=800,
-            height=400
-        ).interactive()
-        st.altair_chart(chart_retransmissao)
+            chart = create_chart(
+                df_selected_ue, '_time:T', 'cell_x_dl_retx:Q', 'Número de blocos retransmitidos no Downlink')
+            st.altair_chart(chart)
 
-        # Gráfico de Área para Utilização da Banda por Período de Tempo
-        st.markdown(
-            "##### Taxa de bits uplink da celula associada ao dispositivo")
-        bandwidth_chart = alt.Chart(df_selected_ue).mark_area().encode(
-            x='_time:T',
-            y='cell_x_ul_bitrate:Q'
-        ).properties(
-            width=800,
-            height=400
-        ).interactive()
-        st.altair_chart(bandwidth_chart)
+            chart = create_chart(
+                df_selected_ue, '_time:T', 'cell_x_dl_tx:Q', 'Blocos de dados enviados com sucesso da rede para os dispositivos conectados a essa célula')
+            st.altair_chart(chart)
+
+            chart = create_chart(
+                df_selected_ue, '_time:T', 'dl_total_bytes_non_incr:Q', 'Bytes de downlink que não foram transmitidos com sucesso.')
+            st.altair_chart(chart)
+
+        with col2:
+            chart = create_chart(df_selected_ue, '_time:T',
+                                 'ul_bitrate:Q', 'Taxa de Bits de tranmissões Uplink')
+            st.altair_chart(chart)
+
+            chart = create_chart(
+                df_selected_ue, '_time:T', 'cell_x_ul_retx:Q', 'Número de blocos retransmitidos no Uplink')
+            st.altair_chart(chart)
+
+            chart = create_chart(df_selected_ue, '_time:T',
+                                 'cell_x_ul_tx:Q', 'Blocos de dados transmitidos com sucesso do UE para a rede')
+            st.altair_chart(chart)
+
+            chart = create_chart(
+                df_selected_ue, '_time:T', 'ul_total_bytes_non_incr:Q', 'Bytes de Uplink que não foram transmitidos com sucesso.')
+            st.altair_chart(chart)
+
+
+if __name__ == "__main__":
+    main()
