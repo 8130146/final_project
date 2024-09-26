@@ -1,0 +1,9 @@
+Feature,Contribution
+ul_bitrate > 0.84,0.2945966066143333
+ul_total_bytes_non_incr > 0.08,0.19255039335440732
+cell_x_dl_retx > 0.24,0.1851068592041676
+cell_x_dl_tx > 0.46,0.176582736615441
+dl_total_bytes_non_incr > 0.05,0.1763987251359315
+dl_bitrate > 0.26,0.17548158535651778
+cell_x_ul_tx > 0.15,-0.030266825599115452
+cell_x_ul_retx > 0.23,-0.023390204814194123
