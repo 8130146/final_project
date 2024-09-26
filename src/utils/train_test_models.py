@@ -56,8 +56,6 @@ def save_model(model, name):
 
 # Funcao para gerar o grafico lime para um modelo
 def generate_lime_plot(best_model, X_train, X_test, X, nome):
-    # Definir o numero de carateristicas a serem explicadas
-    num_features = 8
     # Definir os nomes das características (features)
     feature_names = X.columns.tolist()
 
@@ -85,7 +83,7 @@ def generate_lime_plot(best_model, X_train, X_test, X, nome):
     # Criar explicador LIME
     explainer = lime.lime_tabular.LimeTabularExplainer(
         X_train_df.values, mode='classification', feature_names=feature_names,
-        class_names=['0', '1'], verbose=True, random_state=42)
+        class_names=["Nao ataque", "Ataque DDoS"], verbose=True, random_state=42)
 
     output_dir = f'../images/{nome}'
     os.makedirs(output_dir, exist_ok=True)  # Cria a pasta se não existir
@@ -96,7 +94,7 @@ def generate_lime_plot(best_model, X_train, X_test, X, nome):
     for idx, (i, instance) in enumerate(instances.iterrows()):
         # Criar explicação para a instância
         explanation = explainer.explain_instance(
-            instance.values, best_model.predict_proba, num_features=num_features)
+            instance.values, best_model.predict_proba, num_features=len(feature_names))
         # Guardar o gráfico da explicação LIME
         fig = explanation.as_pyplot_figure()
         fig.savefig(os.path.join(output_dir, f'{nome}_instance_{
@@ -181,7 +179,7 @@ def decisiontree():
         X, Y, test_size=0.2, random_state=42)
 
     params = {
-        'criterion': ['gini', 'entropy'],
+        'criterion': ['gini'],
         'max_depth': [None, 10, 20, 30, 40, 50],
         'min_samples_split': [2, 5, 10, 20],
         # Usar todas as features disponíveis - none
@@ -321,4 +319,4 @@ def naivebayes():
 # Funcao main
 if __name__ == "__main__":
     decisiontree()
-    naivebayes()
+    # naivebayes()
