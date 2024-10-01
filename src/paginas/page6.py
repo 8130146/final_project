@@ -18,7 +18,7 @@ def main():
     prediction = instance_predictions[selected_instance]
     st.subheader(f'Instancia: {selected_instance} | Previsao: {prediction}')
     st.image(f'images/lime_dTree/lime_dTree_instance_{selected_instance}.png')
-    # Exibir arquivo CSV correspondente
+    # Exibir ficheiro CSV correspondente
     contributions_df = pd.read_csv(
         f'images/lime_dTree/lime_dTree_contributions_instance_{selected_instance}.csv')
     st.write(contributions_df)
@@ -40,7 +40,7 @@ def main():
                  prediction_series}')
     st.image(
         f'images/lime_dTree_series/lime_dTree_series_instance_{selected_instance_series}.png')
-    # Exibir arquivo CSV correspondente
+    # Exibir ficheiro CSV correspondente
     contributions_df_series = pd.read_csv(
         f'images/lime_dTree_series/lime_dTree_series_contributions_instance_{selected_instance_series}.csv')
     st.write(contributions_df_series)

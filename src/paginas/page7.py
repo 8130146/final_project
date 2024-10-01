@@ -19,7 +19,7 @@ def main():
     st.subheader(f'Instancia: {selected_instance} | Previsao: {prediction}')
     st.image(
         f'images/lime_naiveBayes/lime_naiveBayes_instance_{selected_instance}.png')
-    # Exibir arquivo CSV correspondente
+    # Exibir ficheiro CSV correspondente
     contributions_df = pd.read_csv(
         f'images/lime_naiveBayes/lime_naiveBayes_contributions_instance_{selected_instance}.csv')
     st.write(contributions_df)
@@ -41,7 +41,7 @@ def main():
                  prediction_series}')
     st.image(
         f'images/lime_naiveBayes_series/lime_naiveBayes_series_instance_{selected_instance_series}.png')
-    # Exibir arquivo CSV correspondente
+    # Exibir ficheiro CSV correspondente
     contributions_df_series = pd.read_csv(
         f'images/lime_naiveBayes_series/lime_naiveBayes_series_contributions_instance_{selected_instance_series}.csv')
     st.write(contributions_df_series)
