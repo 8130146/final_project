@@ -37,7 +37,7 @@ def createSeriesDataset(df):
 
 
 def preprocess_data(df, columns_to_check):
-    # Drop rows with NaN values in the specified columns
+    # Drop linhas com valores NaN nas colunas especificadas
     df_cleaned = df.dropna(subset=columns_to_check)
 
     return df_cleaned
@@ -82,7 +82,7 @@ def main():
                 'cell_x_ul_retx', 'cell_x_ul_tx', 'ul_total_bytes_non_incr', 'dl_total_bytes_non_incr',
             ]
 
-            # Preprocess the data
+            # Preprocessar os dados
             df_preprocessed = preprocess_data(df, columns)
 
             if all(col in df_preprocessed.columns for col in columns):
@@ -106,7 +106,7 @@ def main():
                 st.write(df_preprocessed)
 
                 st.title("LIME Explanation for Model Predictions")
-                # User selects an instance from the dataset
+                # Utilizador seleciona uma instancia do dataset
                 instance_index = st.selectbox(
                     "Select an instance for LIME explanation", X.index)
                 if st.button("Generate LIME Plot"):

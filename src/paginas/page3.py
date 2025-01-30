@@ -24,7 +24,7 @@ def load_model(model_path):
 
 def main():
 
-    # Carregar dados salvos
+    # Carregar dados guardados
     with open('metrics/data_naive_bayes.pkl', 'rb') as f:
         means, variances, feature_names, target_names = pickle.load(f)
 
@@ -51,7 +51,7 @@ def main():
     st.subheader("Variâncias das Características por Classe")
     st.write(pd.DataFrame(variances, index=target_names, columns=feature_names))
 
-    # Carregar dados salvos
+    # Carregar dados guardados
     with open('metrics/data_naive_bayes_series.pkl', 'rb') as f:
         means, variances, feature_names, target_names = pickle.load(
             f)
